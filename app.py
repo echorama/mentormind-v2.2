@@ -182,14 +182,20 @@ def home():
 
 @app.route("/chat", methods=["POST"])
 def chat():
-    user_message = request.json.get("message", "").strip()
-    incoming_session_id = request.json.get("session_id", "").strip()
+    # parse JSON safely even if headers are weird
+    data = request.get_json(force=True, silent=True) or {}
+    user_message = (data.get("message") or "").strip()
 
-    if not user_message or not incoming_session_id:
-        return jsonify({"error": "Missing message or session ID"}), 400
-
-    # Store session ID for consistency
+    # accept missing session_id; generate if not provided
+    incoming_session_id = (
+        (data.get("session_id") or "").strip()
+        or session.get("session_id")
+        or str(uuid.uuid4())
+    )
     session["session_id"] = incoming_session_id
+
+    if not user_message:
+        return jsonify({"error": "Missing message"}), 400
 
     print(f"🟢 USER MESSAGE ({incoming_session_id}): {user_message}")
 
@@ -201,32 +207,30 @@ def chat():
 
         chat_history = get_chat_memory(incoming_session_id)
 
-        messages = [
-            {"role": "system", "content": SYSTEM_PROMPT}
-        ] + chat_history + [
-            {"role": "user", "content": user_message},
-            {"role": "system", "content": (
-                "Here are the regulations retrieved from the database:\n\n"
-                f"{regulations_text}\n\n"
-                "🧠 INSTRUCTIONS FOR INTERPRETATION:\n"
-                "- Carefully examine all retrieved regulations.\n"
-                "- For capital requirements and similar numeric values:\n"
-                "    → Extract **all relevant values** mentioned in regulations.\n"
-                "    → Sort them by date [DD/MM/YYYY].\n"
-                "    → Use the **most recent applicable value**.\n"
-                "⚠️ VERY IMPORTANT:\n"
-                "- Always verify and use the **most recent and legally binding regulation**, especially for numeric obligations like minimum capital requirements.\n"
-                "📚 Always cite like this: '[Document Name]-[DD/MM/YYYY]-Madde[Number]'\n"
-                "💸 Format all amounts like: 'X.XXX TL'\n"
-                "🌐 Use the same language as the user_message."
-            )}
-        ]
+        messages = (
+            [{"role": "system", "content": SYSTEM_PROMPT}]
+            + chat_history
+            + [
+                {"role": "user", "content": user_message},
+                {"role": "system", "content": (
+                    "Here are the regulations retrieved from the database:\n\n"
+                    f"{regulations_text}\n\n"
+                    "🧠 INSTRUCTIONS FOR INTERPRETATION:\n"
+                    "- Carefully examine all retrieved regulations.\n"
+                    "- For capital requirements and similar numeric values:\n"
+                    "    → Extract **all relevant values** mentioned in regulations.\n"
+                    "    → Sort them by date [DD/MM/YYYY].\n"
+                    "    → Use the **most recent applicable value**.\n"
+                    "⚠️ VERY IMPORTANT:\n"
+                    "- Always verify and use the **most recent and legally binding regulation**, especially for numeric obligations like minimum capital requirements.\n"
+                    "📚 Always cite like this: '[Document Name]-[DD/MM/YYYY]-Madde[Number]'\n"
+                    "💸 Format all amounts like: 'X.XXX TL'\n"
+                    "🌐 Use the same language as the user_message."
+                )},
+            ]
+        )
 
         time.sleep(0.1)
-
-        print("📤 GPT Prompt Messages Preview:")
-        for msg in messages:
-            print(f"{msg['role']}:\n{msg['content'][:300]}...\n")
 
         response = client.chat.completions.create(
             model="gpt-4o",
