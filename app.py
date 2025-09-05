@@ -69,6 +69,10 @@ class ChatMemory(db.Model):
     role = db.Column(db.String(20), nullable=False)
     content = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+# --- Create DB tables at startup (works for SQLite or Postgres) ---
+with app.app_context():
+    db.create_all()
+
 
 # Environment variables or keys
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
