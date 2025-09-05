@@ -1,0 +1,14 @@
+Flask==3.0.0
+gunicorn==21.2.0
+openai==1.3.5
+pinecone==3.0.0
+requests==2.31.0
+httpx==0.27.0
+Flask-Cors
+python-docx
+PyMuPDF
+flask_sqlalchemy
+psycopg2-binary
+tiktoken
+
+

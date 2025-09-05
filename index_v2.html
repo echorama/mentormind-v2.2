@@ -1,0 +1,500 @@
+<?php
+/**
+ * The template for displaying the footer.
+ *
+ * Contains the closing of the #content div and all content after.
+ *
+ * @link https://developer.wordpress.org/themes/basics/template-files/#template-partials
+ *
+ * @package Astra
+ * @since 1.0.0
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
+
+?>
+<?php astra_content_bottom(); ?>
+	</div> <!-- ast-container -->
+	</div><!-- #content -->
+<?php
+	astra_content_after();
+
+	astra_footer_before();
+
+	astra_footer();
+
+	astra_footer_after();
+?>
+	</div><!-- #page -->
+<?php
+	astra_body_bottom();
+	wp_footer();
+?>
+
+<!-- Fintechium AI Chatbot Widget Start -->
+<div id="fintechium-label" title="Ask Fintechium AI">Ask Fintechium AI</div>
+<div id="fintechium-chat-button" title="Open chat">💬</div>
+
+<div id="fintechium-chat-modal">
+  <div class="chat-header">
+    Ask Fintechium's AI Advisor
+    <span class="chat-close" id="chat-close-btn" role="button" aria-label="Close chat">×</span>
+  </div>
+  <div class="chat-body" id="chat-body"></div>
+  <div class="chat-input">
+    <input type="text" placeholder="Type your message..." id="chat-input-field" aria-label="Message input" />
+    <button id="chat-send-btn" aria-label="Send message">➤</button>
+  </div>
+</div>
+
+<style>
+  body {
+    font-family: 'Inter', sans-serif;
+  }
+  #fintechium-chat-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    background-color: #00AEC4;
+    color: white;
+    font-size: 24px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    z-index: 9999;
+    transition: all 0.3s ease;
+  }
+  #fintechium-chat-button:hover {
+    background-color: #2d66e0;
+  }
+  #fintechium-chat-modal {
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    width: 440px;
+    height: 600px;
+    background-color: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    overflow: hidden;
+    display: none;
+    flex-direction: column;
+    z-index: 10000;
+    animation: slideUp 0.3s ease;
+    font-family: 'Inter', sans-serif;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .chat-header {
+    background-color: #00AEC4;
+    color: white;
+    padding: 16px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .chat-close {
+    cursor: pointer;
+    font-size: 20px;
+  }
+  .chat-body {
+    flex: 1;
+    padding: 12px;
+    overflow-y: auto;
+  }
+  .chat-input {
+    display: flex;
+    padding: 12px;
+    border-top: 1px solid #eee;
+    background-color: #f9f9f9;
+  }
+  .chat-input input[type="text"] {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+  }
+  .chat-input button {
+    background-color: #00AEC4;
+    color: white;
+    border: none;
+    margin-left: 6px;
+    border-radius: 8px;
+    padding: 0 12px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  .chat-message.user {
+    background-color: #ecf0f1;
+    color: #2C3E50;
+    padding: 10px 14px;
+    margin: 8px 0;
+    max-width: 90%;
+    border-radius: 14px 14px 0 14px;
+    align-self: flex-end;
+    margin-left: auto;
+  }
+  .chat-message.ai {
+    background-color: #00AEC4;
+    color: white;
+    padding: 10px 14px;
+    margin: 8px 0;
+    max-width: 90%;
+    border-radius: 14px 14px 14px 0;
+    align-self: flex-start;
+    margin-right: auto;
+    position: relative;
+  }
+  .chat-message button {
+    background: rgba(255,255,255,0.85);
+    border: none;
+    color: #333;
+    font-size: 12px;
+    padding: 4px 8px;
+    margin-top: 6px;
+    border-radius: 8px;
+    cursor: pointer;
+    float: right;
+  }
+  .chat-typing {
+    display: inline-block;
+    margin: 8px 0;
+    padding: 10px 14px;
+    background-color: #00AEC4;
+    color: white;
+    border-radius: 14px 14px 14px 0;
+    max-width: 85%;
+    margin-right: auto;
+    font-size: 16px;
+  }
+  .chat-typing span {
+    display: inline-block;
+    animation: blink 1.2s infinite;
+  }
+  .chat-typing span:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  .chat-typing span:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+  @keyframes blink {
+    0% { opacity: 0.2; }
+    20% { opacity: 1; }
+    100% { opacity: 0.2; }
+  }
+  #fintechium-label {
+    position: fixed;
+    bottom: 35px;
+    right: 95px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    background: white;
+    color: #00AEC4;
+    padding: 6px 10px;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    z-index: 9999;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  #fintechium-label:hover {
+    background-color: #f0f0f0;
+  }
+  code {
+    background: rgba(255,255,255,0.3);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+  }
+  
+@media (max-width: 480px) {
+  #fintechium-chat-modal {
+    width: 90vw;          /* reduced width */
+    height: 78vh;         /* reduced height */
+    right: 10px;
+    bottom: 70px;
+    max-height: 600px;
+    overflow: hidden;
+  }
+
+  .chat-body {
+    max-height: calc(78vh - 140px);
+    padding: 12px;
+    overflow-y: auto;
+    word-wrap: break-word;
+  }
+
+  .chat-message.user,
+  .chat-message.ai,
+  .chat-typing {
+    max-width: 100%;
+    font-size: 14px;
+  }
+
+  .chat-body img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    display: block;
+    margin: 8px 0;
+  }
+
+  .chat-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+}
+ 
+</style>
+
+<script>
+(function () {
+  const chatModal = document.getElementById("fintechium-chat-modal");
+  const chatBody = document.getElementById("chat-body");
+  const chatInput = document.getElementById("chat-input-field");
+
+  function getSessionId() {
+    let id = localStorage.getItem("fintechiumSessionId");
+    if (!id) {
+      id = Math.random().toString(36).substr(2, 9);
+      localStorage.setItem("fintechiumSessionId", id);
+    }
+    return id;
+  }
+
+  function saveChatToLocalStorage() {
+    localStorage.setItem("fintechiumChatHistory", chatBody.innerHTML);
+  }
+
+  function loadChatFromLocalStorage() {
+    const saved = localStorage.getItem("fintechiumChatHistory");
+    if (saved) {
+      chatBody.innerHTML = saved;
+    }
+  }
+
+  function formatResponse(text) {
+    const lines = text.split('\n').filter(line => line.trim() !== '');
+    let formatted = '';
+    let inUl = false;
+    let inOl = false;
+
+    function applyInlineMarkdown(line) {
+      const boldRegex = /\*\*(.+?)\*\*/g;
+      const italicRegex = /_(.+?)_/g;
+      const codeRegex = /`(.+?)`/g;
+      line = line.replace(boldRegex, "<strong>$1</strong>");
+      line = line.replace(italicRegex, "<em>$1</em>");
+      line = line.replace(codeRegex, "<code>$1</code>");
+      return line;
+    }
+
+    lines.forEach(line => {
+      const bulletMatch = /^\s*[-•*]\s+(.+)/.exec(line);
+      const numberMatch = /^\s*(\d+)\.\s+(.+)/.exec(line);
+
+      if (bulletMatch) {
+        if (!inUl) {
+          formatted += '<ul>';
+          inUl = true;
+        }
+        formatted += `<li>${applyInlineMarkdown(bulletMatch[1])}</li>`;
+      } else if (numberMatch) {
+        if (!inOl) {
+          formatted += '<ol>';
+          inOl = true;
+        }
+        formatted += `<li>${applyInlineMarkdown(numberMatch[2])}</li>`;
+      } else {
+        if (inUl) { formatted += '</ul>'; inUl = false; }
+        if (inOl) { formatted += '</ol>'; inOl = false; }
+        formatted += `<p>${applyInlineMarkdown(line)}</p>`;
+      }
+    });
+
+    if (inUl) formatted += '</ul>';
+    if (inOl) formatted += '</ol>';
+
+    return formatted;
+  }
+
+  function addMessage(sender, text) {
+    const msg = document.createElement("div");
+    msg.className = `chat-message ${sender}`;
+
+    if (sender === "ai") {
+      const contentWrapper = document.createElement("div");
+      contentWrapper.innerHTML = text;
+
+      const copyBtn = document.createElement("button");
+      copyBtn.textContent = "📋 Copy";
+      copyBtn.addEventListener("click", () => {
+        const temp = document.createElement("textarea");
+        temp.value = contentWrapper.innerText;
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand("copy");
+        document.body.removeChild(temp);
+        copyBtn.textContent = "✅ Copied!";
+        setTimeout(() => { copyBtn.textContent = "📋 Copy"; }, 1500);
+      });
+
+      msg.appendChild(contentWrapper);
+      msg.appendChild(copyBtn);
+    } else {
+      msg.textContent = text;
+    }
+
+    chatBody.appendChild(msg);
+    chatBody.scrollTop = chatBody.scrollHeight;
+    saveChatToLocalStorage();
+  }
+
+  function showTypingIndicator() {
+    const typing = document.createElement("div");
+    typing.className = "chat-typing";
+    typing.id = "typing-indicator";
+    typing.innerHTML = "<span>.</span><span>.</span><span>.</span>";
+    chatBody.appendChild(typing);
+    chatBody.scrollTop = chatBody.scrollHeight;
+  }
+
+  function removeTypingIndicator() {
+    const typing = document.getElementById("typing-indicator");
+    if (typing) typing.remove();
+  }
+
+  function addQuickQuestions() {
+    const container = document.createElement("div");
+    container.style.display = "flex";
+    container.style.flexDirection = "column";
+    container.style.gap = "10px";
+    container.style.marginTop = "12px";
+
+    const questions = [
+      "📌 What are the capital requirements for e-money institutions?",
+      "📝 How do I apply for a crypto asset license in Turkey?",
+      "📂 What are the key regulations for establishing a fintech company in Turkey?"
+    ];
+
+    questions.forEach(text => {
+      const button = document.createElement("button");
+      button.textContent = text;
+
+      Object.assign(button.style, {
+        backgroundColor: "#f1faff",
+        color: "#007d91",
+        border: "1px solid #00AEC4",
+        borderRadius: "12px",
+        padding: "10px 14px",
+        fontSize: "14px",
+        textAlign: "left",
+        cursor: "pointer",
+        boxShadow: "0 2px 5px rgba(0,0,0,0.06)",
+        fontWeight: "500",
+        transition: "background-color 0.2s ease, transform 0.2s ease"
+      });
+
+      button.addEventListener("mouseenter", () => {
+        button.style.backgroundColor = "#e0f7fc";
+        button.style.transform = "translateY(-1px)";
+      });
+
+      button.addEventListener("mouseleave", () => {
+        button.style.backgroundColor = "#f1faff";
+        button.style.transform = "translateY(0)";
+      });
+
+      button.addEventListener("click", () => {
+        chatInput.value = text;
+        sendMessage();
+      });
+
+      container.appendChild(button);
+    });
+
+    const quickMsgWrapper = document.createElement("div");
+    quickMsgWrapper.appendChild(container);
+
+    const lastAIMessage = chatBody.querySelector(".chat-message.ai:last-of-type");
+    if (lastAIMessage) {
+      lastAIMessage.appendChild(quickMsgWrapper);
+    }
+  }
+
+  function toggleChat(open = true) {
+    chatModal.style.display = open ? "flex" : "none";
+
+    if (open && !sessionStorage.getItem("fintechiumWelcomeShown")) {
+      addMessage("ai", formatResponse(
+        "👋 Welcome to <strong>Fintechium AI Advisor</strong>! I’m here to assist you with <strong>regulatory compliance</strong>, <strong>licensing</strong>, and <strong>market entry questions</strong> specific to the <strong>Turkish fintech landscape</strong>."
+      ));
+      setTimeout(addQuickQuestions, 150);
+      sessionStorage.setItem("fintechiumWelcomeShown", "true");
+    }
+  }
+
+  function sendMessage() {
+    const message = chatInput.value.trim();
+    if (!message) return;
+
+    addMessage("user", message);
+    chatInput.value = "";
+    showTypingIndicator();
+
+    fetch("https://mentormind-v2-9a768a1ca4a8.herokuapp.com/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: message,
+        session_id: getSessionId()
+      })
+    })
+      .then(res => res.json())
+      .then(data => {
+        removeTypingIndicator();
+        addMessage("ai", formatResponse(data.response || "⚠️ Sorry, I couldn't find a response."));
+      })
+      .catch(error => {
+        removeTypingIndicator();
+        console.error("API Error:", error);
+        addMessage("ai", "❌ Error contacting the AI Advisor. Please try again.");
+      });
+  }
+
+  document.getElementById("chat-send-btn").addEventListener("click", sendMessage);
+  document.getElementById("chat-input-field").addEventListener("keypress", (e) => {
+    if (e.key === "Enter") sendMessage();
+  });
+
+  document.getElementById("chat-close-btn").addEventListener("click", () => toggleChat(false));
+  document.getElementById("fintechium-chat-button").addEventListener("click", () => toggleChat(true));
+  document.getElementById("fintechium-label").addEventListener("click", () => toggleChat(true));
+  
+  const ctaButton = document.getElementById("chatbot-cta");
+  if (ctaButton) {
+    ctaButton.addEventListener("click", () => toggleChat(true));
+  }
+  
+  loadChatFromLocalStorage();
+})();
+</script>
+
+<!-- Fintechium AI Chatbot Widget End -->
+
+
+	</body>
+</html>
